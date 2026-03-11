@@ -1,38 +1,330 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Callback Page</title>
-    <link rel="stylesheet" href="/callback/styles/styles.css" type="text/css" />
+    <title>Query Parameters</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #0f1117;
+        --surface: #1a1d27;
+        --border: #2a2d3a;
+        --accent: #00e5a0;
+        --accent-dim: rgba(0, 229, 160, 0.1);
+        --text: #e8eaf0;
+        --muted: #6b7080;
+        --error: #ff5f6d;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "IBM Plex Sans", sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 40px;
+        max-width: 520px;
+        width: 100%;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--accent);
+        display: inline-block;
+        margin-right: 8px;
+        animation: pulse 2s infinite;
+      }
+
+      .status-dot.error {
+        background: var(--error);
+        animation: none;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      .label {
+        font-size: 11px;
+        font-family: "IBM Plex Mono", monospace;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      h1 {
+        font-size: 22px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--text);
+      }
+
+      .subtitle {
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 32px;
+        line-height: 1.5;
+      }
+
+      .code-block {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        word-break: break-all;
+        color: var(--accent);
+        line-height: 1.6;
+        margin-bottom: 20px;
+        min-height: 60px;
+        position: relative;
+      }
+
+      .code-block.error-text {
+        color: var(--error);
+      }
+
+      .btn {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 8px;
+        font-family: "IBM Plex Sans", sans-serif;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        background: var(--accent);
+        color: #0f1117;
+      }
+
+      .btn:hover {
+        opacity: 0.88;
+        transform: translateY(-1px);
+      }
+      .btn:active {
+        transform: translateY(0);
+      }
+      .btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn.copied {
+        background: var(--accent-dim);
+        color: var(--accent);
+        border: 1px solid var(--accent);
+      }
+
+      .divider {
+        height: 1px;
+        background: var(--border);
+        margin: 28px 0;
+      }
+
+      .step {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 14px;
+      }
+
+      .step-num {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--accent-dim);
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        font-size: 11px;
+        font-family: "IBM Plex Mono", monospace;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .step p {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .step p strong {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      /* new styles for parameter list */
+      .param-row {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+
+      .param-header {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .param-key {
+        font-size: 15px;
+        font-family: "IBM Plex Mono", monospace;
+        color: var(--text);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .param-row .code-block {
+        width: 100%;
+        margin-bottom: 0;
+      }
+
+      .param-header .btn {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+    </style>
   </head>
   <body>
-    <script type="text/javascript" src="/callback/scripts/purify.min.js"></script>
-    <h1>Query Parameters</h1>
-    <div class="warning-message">
-      <strong>Notice:</strong> If you
-      came to this page from an email or message, do not follow any links or messages on
-      this page as <strong>it may be a scam</strong>.  This page is intended for developers to retrieve query parameters.
+    <div class="card">
+      <div class="label">
+        <span class="status-dot" id="dot"></span>
+        Query Parameters
+      </div>
+
+      <h1 id="heading">OAuth Callback</h1>
+      <p class="subtitle" id="subtitle">
+        This page is for for developers working with OAuth. Below are the
+        parameters found in the URL.
+      </p>
+
+      <!-- parameter list will be generated here -->
+      <div id="paramsContainer"></div>
+
+      <div class="divider"></div>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <p><strong>Copy a parameter value</strong> using the Copy button.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <p><strong>Switch back</strong> to the OAuth app.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <p><strong>Paste the value</strong> into the appropriate prompt.</p>
+      </div>
     </div>
-    <div id="params" class=""></div>
+
     <script>
       const params = new URLSearchParams(window.location.search);
-      const paramsObj = Array.from(params.keys()).reduce(
-        (acc, val) => ({ ...acc, [val]: params.get(val) }),
-        {}
-      );
-      let newHtml = "";
-      Object.keys(paramsObj).forEach((e) => {
-        console.log(`key=${e}  value=${paramsObj[e]}`);
-        newHtml += `<div style="font-weight: bold;">${DOMPurify.sanitize(
-          e
-        )}</div> <textarea rows=5 style="border: 1px lightgray solid; width:100%; margin-bottom:12px;">${DOMPurify.sanitize(
-          paramsObj[e]
-        )}</textarea>`;
-      });
-      const divToChange = document.getElementById("params");
-      divToChange.innerHTML = newHtml;
+      const dot = document.getElementById("dot");
+      const paramsContainer = document.getElementById("paramsContainer");
+
+      function makeCopyButton(text) {
+        const btn = document.createElement("button");
+        btn.className = "btn";
+        btn.textContent = "Copy";
+        btn.onclick = () => {
+          navigator.clipboard.writeText(text).then(() => {
+            btn.textContent = "Copied ✓";
+            btn.classList.add("copied");
+            setTimeout(() => {
+              btn.textContent = "Copy";
+              btn.classList.remove("copied");
+            }, 2500);
+          });
+        };
+        return btn;
+      }
+
+      function renderParams() {
+        if (!params.toString()) {
+          const msg = document.createElement("div");
+          msg.textContent = "No query parameters found in URL.";
+          msg.className = "code-block error-text";
+          paramsContainer.appendChild(msg);
+          dot.classList.add("error");
+          return;
+        }
+
+        params.forEach((value, key) => {
+          const row = document.createElement("div");
+          row.className = "param-row";
+
+          // header holds the key label and its copy button (button below label)
+          const header = document.createElement("div");
+          header.className = "param-header";
+
+          const label = document.createElement("div");
+          label.className = "param-key";
+          label.textContent = key + ":";
+
+          const copyBtn = makeCopyButton(value);
+          header.append(label, copyBtn);
+
+          const codeBlock = document.createElement("div");
+          codeBlock.className = "code-block";
+          codeBlock.textContent = value;
+          if (key === "error") {
+            codeBlock.classList.add("error-text");
+            dot.classList.add("error");
+            document.getElementById("heading").textContent =
+              "Authorization Failed";
+            document.getElementById("subtitle").textContent =
+              "Microsoft returned an error. Please try running the shortcut again.";
+            // hide timer if it exists
+            const timerBox = document.getElementById("timerBox");
+            if (timerBox) timerBox.style.display = "none";
+          }
+
+          row.append(header, codeBlock);
+          paramsContainer.appendChild(row);
+        });
+      }
+
+      renderParams();
     </script>
   </body>
 </html>
